@@ -1,6 +1,9 @@
-# TextGame - Quest Runner  
+# Text Game - Quest Runner  
   
 Just a Text Game coded in C
+  
+WINDOWS : PASSES  
+LINUX   : FAILS  
   
 #### COMPILE WITH GCC TESTED
 
