@@ -16,5 +16,8 @@ Your OS must support XTERM for linux or enable VTS in Windows 10+.
   
 Windows 7 and older does not support VTS.  
   
+  WINDOWS    
 ![progress](progress1.png)  
   
+  LINUX  
+![progress](lprogress1.png)  
