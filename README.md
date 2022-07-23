@@ -7,7 +7,8 @@ LINUX   : PASSES
   
 #### COMPILE WITH GCC TESTED
 
-    gcc -Wall -m64 -Os -static main.c -o questrunner -s
+    WINDOWS : gcc -Wall -m64 -Os -static main.c vts.c -o questrunner -s  
+    LINUX   : gcc -Wall -m64 -Os -static main.c vts.c linuxfunctions.c -o questrunner -s  
 
 #### NOTES  
 This game is a work in progress. It is not finished yet.  
