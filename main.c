@@ -5,15 +5,16 @@
 #define UNICODE
 #include <errno.h>        // errno
 #include <time.h>         // clock_t  clock()
-#include <conio.h>        // kbhit()    getch()
 #ifdef _WIN64
 #include <windows.h>      // HANDLE   DWORD   STD_OUTPUT_HANDLE   INVALID_HANDLE_VALUE   GetStdHandle()
                           // GetConsoleMode()   SetConsoleMode()    ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #include <fcntl.h>        // _setmode()   _O_U8TEXT
 #include <stdio.h>        // stdout  _fileno  wprintf()
+#include <conio.h>        // kbhit()    getch()
 #else
 #include <wchar.h>        // wprintf()
 #include <locale.h>       // setlocale()   LC_ALL
+#include <unistd.h>       // usleep()
 #endif
 
 #define KEY_UP 72
@@ -71,7 +72,9 @@ int main()
         showCursor();
         wprintf(L"\x1b[94mThanks for playing.\n");
         setDefaultColor();
+#ifdef _WIN64
         ShowScrollBar(GetConsoleWindow(), SB_VERT, 1);  // disable scrollbar
+#endif // _WIN64
     } else {
         wprintf(L"ERROR: We are unable to initialize the console colors properly.\n");
         return errno;
@@ -260,7 +263,7 @@ void delay(int number_of_milliseconds)
 #ifdef _WIN64
     Sleep(number_of_milliseconds);
 #else
-    sleep(number_of_milliseconds * 0.01);
+    usleep(number_of_milliseconds);
 #endif // _WIN64
     clock_t clock_time = clock();
     while(clock() < clock_time + number_of_milliseconds);
