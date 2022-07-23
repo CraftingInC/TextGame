@@ -1,6 +1,6 @@
 
 // Console Virtual Terminal Sequences
-/* gcc -Wall -m64 -Os -static main.c -o test -s */
+/* gcc -Wall -m64 -Os -static main.c -o questrunner -s */
 
 #define UNICODE
 #include <errno.h>        // errno

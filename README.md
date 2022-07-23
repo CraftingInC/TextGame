@@ -3,7 +3,7 @@
 Just a Text Game coded in C
   
 WINDOWS : PASSES  
-LINUX   : FAILS  
+LINUX   : PASSES  
   
 #### COMPILE WITH GCC TESTED
 
