@@ -1,10 +1,11 @@
 
 // Console Virtual Terminal Sequences
-/* gcc -Wall -m64 -Os -static main.c -o questrunner -s */
+/* gcc -Wall -m64 -Os -static main.c -o test -s */
 
 #define UNICODE
 #include <errno.h>        // errno
 #include <time.h>         // clock_t  clock()
+#include <stdio.h>        // stdout  _fileno  wprintf()  LINUX --> getchar()
 #ifdef _WIN64
 #include <windows.h>      // HANDLE   DWORD   STD_OUTPUT_HANDLE   INVALID_HANDLE_VALUE   GetStdHandle()
                           // GetConsoleMode()   SetConsoleMode()    ENABLE_VIRTUAL_TERMINAL_PROCESSING
@@ -12,9 +13,15 @@
 #include <stdio.h>        // stdout  _fileno  wprintf()
 #include <conio.h>        // kbhit()    getch()
 #else
+#include <termios.h>
 #include <wchar.h>        // wprintf()
 #include <locale.h>       // setlocale()   LC_ALL
 #include <unistd.h>       // usleep()
+#include <sys/ioctl.h>
+#include <sys/select.h>
+
+int kbhit(void);
+int getch(void);
 #endif
 
 #define KEY_UP 72
@@ -92,7 +99,7 @@ void spindleCharacters(int h, int v)
     if(spin == 3) {wprintf(L"-");}
     spin++;
     if(spin > 3){spin = 0;}
-    delay(60);
+    delay(1);
 }
 
 void getKey()
@@ -262,11 +269,11 @@ void delay(int number_of_milliseconds)
 {
 #ifdef _WIN64
     Sleep(number_of_milliseconds);
-#else
-    usleep(number_of_milliseconds);
-#endif // _WIN64
     clock_t clock_time = clock();
     while(clock() < clock_time + number_of_milliseconds);
+#else
+    usleep(number_of_milliseconds * 5000);
+#endif // _WIN64
 }
 
 void showCursor()
@@ -335,6 +342,42 @@ void menuBackground()
        ░        ░ \x1b[92mCraftingInC 2022 \x1b[31m     ░       ░   ░     \x1b[0m\
 ", GAMEVERSION);
 }
+
+#ifndef _WIN64
+/* Reads  from keypress, doesn't echo */
+int getch(void)
+{
+    struct termios oldattr, newattr;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldattr);
+    newattr = oldattr;
+    newattr.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, *newattr);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+    return ch;
+}
+
+int kbhit(void)
+{
+    static const int STDIN = 0;
+    static int initialized = 0;
+    if(!initialized)
+    {
+        // Use termios to turn off line buffering
+        struct termios term;
+        tcgetattr(STDIN, &term);
+        term.c_lflag &= ~ICANON;
+        tcsetattr(STDIN, TCSANOW, &term);
+        setbuf(stdin, NULL);
+        initialized = 1;
+    }
+    int bytesWaiting;
+    ioctl(STDIN, FIONREAD, &bytesWaiting);
+    return bytesWaiting;
+}
+#endif // _WIN64
+
 /*
 https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
 
