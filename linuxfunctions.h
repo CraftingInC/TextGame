@@ -3,6 +3,7 @@
 
 #ifndef _WIN64
 #include <termios.h>
+#include <stdio.h>        // stdout  _fileno  wprintf()  LINUX --> getchar()
 #include <wchar.h>        // wprintf()
 #include <locale.h>       // setlocale()   LC_ALL
 #include <unistd.h>       // usleep()

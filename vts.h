@@ -4,8 +4,6 @@
 #define UNICODE
 #include <errno.h>        // errno
 #include <time.h>         // clock_t  clock()
-#include <stdio.h>        // stdout  _fileno  wprintf()  LINUX --> getchar()
-
 #ifdef _WIN64
 #include <windows.h>      // HANDLE   DWORD   STD_OUTPUT_HANDLE   INVALID_HANDLE_VALUE   GetStdHandle()
                           // GetConsoleMode()   SetConsoleMode()    ENABLE_VIRTUAL_TERMINAL_PROCESSING
