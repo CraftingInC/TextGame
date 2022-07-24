@@ -17,8 +17,7 @@ enum GAMESTATE
     MAINMENU = 0,
     NEWGAME,
     LOADGAME,
-    GENERATE,
-    GAMELOOP,
+    SAVEGAME,
     QUITGAME
 };
 
@@ -89,7 +88,10 @@ void getKey()
             }
             case 'm':
             {
-                getGameState = MAINMENU;
+                if(getGameState != MAINMENU)
+                {
+                    getGameState = MAINMENU;
+                }
                 break;
             }
             case 'n':
@@ -105,6 +107,14 @@ void getKey()
                 if(getGameState == MAINMENU)
                 {
                     getGameState = LOADGAME;
+                }
+                break;
+            }
+            case 's':
+            {
+                if(getGameState == MAINMENU)
+                {
+                    getGameState = SAVEGAME;
                 }
                 break;
             }
@@ -152,16 +162,42 @@ void showMenu()
         }
     } else if(getGameState == NEWGAME)
     {
-        drawRectangle(48, 3, 28, 5);
+        drawRectangle(48, 3, 28, 3);
         setCursorPosition(53, 3);
         wprintf(L"\x1b[91mNEW GAME\x1b[0m\n");
-        setHorizontalCursorPosition(51);
-        wprintf(L"\x1b[94mG = Generate Character \x1b[0m\n");
         setHorizontalCursorPosition(51);
         wprintf(L"\x1b[94mM = MAIN MENU\x1b[0m\n");
         setHorizontalCursorPosition(51);
         wprintf(L"\x1b[94mQ = Quit Game\x1b[0m\n");
         while(getGameState == NEWGAME)
+        {
+            getKey();
+            if(getGameState != QUITGAME || getGameState != MAINMENU) {spindleCharacters(49, 4);}
+        }
+    } else if(getGameState == LOADGAME)
+    {
+        drawRectangle(48, 3, 28, 3);
+        setCursorPosition(53, 3);
+        wprintf(L"\x1b[91mLOAD GAME\x1b[0m\n");
+        setHorizontalCursorPosition(51);
+        wprintf(L"\x1b[94mM = MAIN MENU\x1b[0m\n");
+        setHorizontalCursorPosition(51);
+        wprintf(L"\x1b[94mQ = Quit Game\x1b[0m\n");
+        while(getGameState == LOADGAME)
+        {
+            getKey();
+            if(getGameState != QUITGAME || getGameState != MAINMENU) {spindleCharacters(49, 4);}
+        }
+    } else if(getGameState == SAVEGAME)
+    {
+        drawRectangle(48, 3, 28, 3);
+        setCursorPosition(53, 3);
+        wprintf(L"\x1b[91mLOAD GAME\x1b[0m\n");
+        setHorizontalCursorPosition(51);
+        wprintf(L"\x1b[94mM = MAIN MENU\x1b[0m\n");
+        setHorizontalCursorPosition(51);
+        wprintf(L"\x1b[94mQ = Quit Game\x1b[0m\n");
+        while(getGameState == SAVEGAME)
         {
             getKey();
             if(getGameState != QUITGAME || getGameState != MAINMENU) {spindleCharacters(49, 4);}
