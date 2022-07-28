@@ -4,28 +4,39 @@
 #define UNICODE
 #include <errno.h>        // errno
 #include <time.h>         // clock_t  clock()
-#ifdef _WIN64
+#ifdef _WIN64  // Windows 10+
 #include <windows.h>      // HANDLE   DWORD   STD_OUTPUT_HANDLE   INVALID_HANDLE_VALUE   GetStdHandle()
                           // GetConsoleMode()   SetConsoleMode()    ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #include <fcntl.h>        // _setmode()   _O_U8TEXT
 #include <stdio.h>        // stdout  _fileno  wprintf()
 #include <conio.h>        // kbhit()    getch()
-#else
-#include "linuxfunctions.h"
-#endif
+#else  // Linux
+#include <termios.h>
+#include <stdio.h>        // stdout  _fileno  wprintf()  LINUX --> getchar()
+#include <wchar.h>        // wprintf()
+#include <locale.h>       // setlocale()   LC_ALL
+#include <unistd.h>       // usleep()
+#include <sys/ioctl.h>
+#include <sys/select.h>
+int getch(void);
+int kbhit(void);
+#endif // _WIN64 (Win10+)
 
 int initConsoleColors();
-void drawRectangle(int h, int v, int sizeH, int sizeV);
+void drawRectangle(int h, int v, int sizeH, int sizeV, wchar_t* color);
 void clearScreen();
+void clearRectangle();
 void setVerticalCursorPosition(int v);
 void setHorizontalCursorPosition(int h);
 void setCursorPosition(int h, int v);
 void setBackgroundForgroundColor(int b, int f);
 void setTextColor(int c);
 void setDefaultColor();
+void restoreDefaultWindow();
 void showCursor();
 void hideCursor();
 void setTitle(wchar_t* str);
+void delay(int number_of_milliseconds);
 
 #endif // _VTS_H_
 
@@ -34,6 +45,25 @@ https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequen
 
 ESC = \x1b
 EXAMPLE : \x1b[3G --- 3 space to the right
+
+printf("\x1b[8;40;132t");  set console size   132x40
+
+ESC [ ? 3 h 	DECCOLM 	Set Number of Columns to 132 	Sets the console width to 132 columns wide.
+ESC [ ? 3 l 	DECCOLM 	Set Number of Columns to 80 	Sets the console width to 80 columns wide.
+ESC [ ! p 	DECSTR 	Soft Reset 	Reset certain terminal settings to their defaults.
+
+Screen size changing for the wyse60/wyse160
+ESC`;      set to 132 columns
+ESC`:      set to 80 columns
+ESCe+      set to 43 lines
+ESCe)      set to 25 lines
+
+Screen size changing for all other terminal types
+ESC[?3h    set to 132 columns
+ESC[?3l    set to 80 columns
+ESC[?26h    set to 43 lines
+ESC[?26l    set to 24 lines
+ESC[?27l    set to 25 lines
 
 ESC [ <n> A 	  Cursor Up 	Cursor up by <n>
 ESC [ <n> B 	  Cursor Down 	Cursor down by <n>
@@ -108,4 +138,14 @@ ESC ( B  Designate Character Set – US ASCII           Enables ASCII Mode (Defa
 105 Bright Background Magenta 	Applies bold/bright magenta to background
 106 Bright Background Cyan 	    Applies bold/bright cyan to background
 107 Bright Background White 	Applies bold/bright white to background
+
+Key 	Normal Mode 	Application Mode
+Up Arrow 	ESC [ A 	ESC O A
+Down Arrow 	ESC [ B 	ESC O B
+Right Arrow 	ESC [ C 	ESC O C
+Left Arrow 	ESC [ D 	ESC O D
+Home 	ESC [ H 	ESC O H
+End 	ESC [ F 	ESC O F
+
 */
+
